@@ -1,0 +1,57 @@
+<html>
+  <head></head>
+  <body>
+    <form action="">
+      <input type="text" id="search">
+      <input type="submit">
+    </form>
+
+    <form action="">
+      <input type="text" id="search_keyup">
+    </form>
+
+    <ul id="places"></ul>
+
+    <script>
+      let url = `https://places-dsn.algolia.net/1/places/query?`;
+      const places = document.getElementById("places");
+
+      const form = document.querySelector("form");
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        let value = event.currentTarget.querySelector("#search").value;
+
+        fetch(url, {
+          method: 'POST',
+          body: JSON.stringify({query: value})
+        })
+        .then(response => response.json())
+        .then((data) => {
+          places.innerHTML = "";
+          data.hits.forEach((hit) => {
+            places.insertAdjacentHTML("beforeend", `
+              <li>${hit.administrative[0]}</li>
+            `);
+          })
+        });
+      })
+
+      const searchAlgoliaPlaces = (event) => {
+        fetch("https://places-dsn.algolia.net/1/places/query", {
+          method: "POST",
+          body: JSON.stringify({ query: event.currentTarget.value })
+        })
+          .then(response => response.json())
+          .then((data) => {
+            console.log(data.hits); // Look at local_names.default
+          });
+      };
+
+      const input = document.querySelector("#search_keyup");
+      input.addEventListener("keyup", searchAlgoliaPlaces);
+
+
+    </script>
+  </body>
+</html>
